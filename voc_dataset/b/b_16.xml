@@ -1,0 +1,26 @@
+<annotation>
+	<folder>black</folder>
+	<filename>black_16.jpg</filename>
+	<path>D:\YJZ\Python\pic_source\black\black_16.jpg</path>
+	<source>
+		<database>Unknown</database>
+	</source>
+	<size>
+		<width>320</width>
+		<height>320</height>
+		<depth>3</depth>
+	</size>
+	<segmented>0</segmented>
+	<object>
+		<name>b</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>81</xmin>
+			<ymin>79</ymin>
+			<xmax>229</xmax>
+			<ymax>235</ymax>
+		</bndbox>
+	</object>
+</annotation>
