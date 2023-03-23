@@ -43,4 +43,4 @@ pip install pillow
 6.Run **"deploy.py"** on computer or embedded device to classify object real-time.
 
  # *4. FlowChart*
- ![Alt](https://img-blog.csdnimg.cn/fda95eb8067944d0a5219b05685171be.png#pic_center)
+ ![Alt](https://img-blog.csdnimg.cn/5ae5b372ccd9494d8de4028771da26ab.png#pic_center)
