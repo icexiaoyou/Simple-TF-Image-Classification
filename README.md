@@ -10,9 +10,9 @@
 
 Image classification by **tensorflow** and **opencv**.<br>
 Only four python scripts can complete the training and deployment of custom model.
-preprocess.py: Rename & Resize pictures
-train.py: Generate dataset and Train
-test_model.py: Check the Performance of the new model
+preprocess.py: Rename & Resize pictures<br>
+train.py: Generate dataset and Train<br>
+test_model.py: Check the Performance of the new model<br>
 deploy.py: Use camera to run the new model
 
 # *2. Preparation*
