@@ -1,5 +1,5 @@
 中文教程：<br>
-[Blog] https://www.steamforfun.cn/?p=413 <br>
+[BLOG] https://www.steamforfun.cn/?p=413 <br>
 [CSDN] http://t.csdn.cn/XNsTS <br>
 
 @[TOC](Simple Tensorflow Image Classification)
