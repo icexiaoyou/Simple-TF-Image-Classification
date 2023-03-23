@@ -1,3 +1,7 @@
+中文教程：<br>
+[Blog] https://www.steamforfun.cn/?p=413 <br>
+[CSDN] http://t.csdn.cn/XNsTS <br>
+
 @[TOC](Simple Tensorflow Image Classification)
 - [*1. Description*](#-1-description-)
 - [*2. Preparation*](#-2-preparation-)
