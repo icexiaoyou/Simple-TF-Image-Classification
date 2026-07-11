@@ -1,49 +1,46 @@
-# Deploy your trained model(.h5) to the target machine
-
-print('Script is working...')
-
-import tensorflow as tf
+﻿"""Run real-time OpenCV inference with a trained Keras classifier."""
+from __future__ import annotations
+import argparse
+import json
+from pathlib import Path
 import cv2
 import numpy as np
+import tensorflow as tf
 
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--model", type=Path, default=Path("artifacts/classifier.keras"))
+    parser.add_argument("--labels", type=Path, default=Path("artifacts/class_names.json"))
+    parser.add_argument("--source", default="0", help="Camera index or video path")
+    parser.add_argument("--threshold", type=float, default=0.5)
+    return parser.parse_args()
 
-# ----------Custom Inputs for Scripts----------
-target_size = (640, 640)
-# ----------That's ALL You Need to Do----------
+def main() -> None:
+    args = parse_args()
+    model = tf.keras.models.load_model(args.model)
+    labels = json.loads(args.labels.read_text(encoding="utf-8"))
+    height, width = model.input_shape[1:3]
+    source: int | str = int(args.source) if args.source.isdigit() else args.source
+    capture = cv2.VideoCapture(source)
+    if not capture.isOpened():
+        raise SystemExit(f"Unable to open source: {args.source}")
+    try:
+        while True:
+            ok, frame = capture.read()
+            if not ok:
+                break
+            rgb = cv2.cvtColor(cv2.resize(frame, (width, height)), cv2.COLOR_BGR2RGB)
+            probabilities = model.predict(np.expand_dims(rgb, axis=0), verbose=0)[0]
+            index = int(np.argmax(probabilities))
+            confidence = float(probabilities[index])
+            label = labels[index] if confidence >= args.threshold else "uncertain"
+            cv2.putText(frame, f"{label}: {confidence:.1%}", (12, 32), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+            cv2.imshow("Image classification", frame)
+            if cv2.waitKey(1) & 0xFF in (ord("q"), 27):
+                break
+    finally:
+        capture.release()
+        cv2.destroyAllWindows()
 
-
-
-# Load kreas model named xx.h5
-model = tf.keras.models.load_model('model.h5')
-
-# Open camera
-cap = cv2.VideoCapture(0)
-
-# Read video frame and transform to keras format
-while True:
-    ret, frame = cap.read()
-    if not ret:
-        break
-    # Resize the video frame
-    img = cv2.resize(frame, target_size)
-    # Transform to numpy format
-    input_arr = tf.keras.utils.img_to_array(img)
-    input_arr = np.array([input_arr])
-
-    # Use keras.Model.predict, send the model and input sample
-    predictions =  tf.keras.Model.predict(model,x=input_arr)
-
-    # Print the result of prediction, including class_index and confidence
-    class_idx = np.argmax(predictions[0])
-    confidence = predictions[0][class_idx]
-    text = 'Prediction: {}, Confidence: {:.2f}'.format(class_idx, confidence)
-    cv2.putText(frame,text, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
-
-    # Show video frame
-    cv2.imshow('frame', frame)
-    # Enter 'q' to quit
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
-
-# Close camera
-cv2.destroyAllWindows()
+if __name__ == "__main__":
+    main()

@@ -1,53 +1,40 @@
-中文教程：<br>
-[BLOG] https://www.steamforfun.cn/?p=413 <br>
-[CSDN] http://t.csdn.cn/XNsTS <br>
+﻿# Simple TensorFlow Image Classification
 
-@[TOC](Simple Tensorflow Image Classification)
-- [*1. Description*](#-1-description-)
-- [*2. Preparation*](#-2-preparation-)
-  * [2.1. Install Visual Studio Community 2022](#21-install-visual-studio-community-2022)
-  * [2.2. Install Anaconda](#22-install-anaconda)
-- [*3. Usage*](#-3-usage-)
-- [*4. FlowChart*](#-4-flowchart-)
+A current TensorFlow/Keras image-classification workflow for a directory-per-class dataset. It uses transfer learning, saves the portable `.keras` format, and keeps preprocessing non-destructive.
 
-# *1. Description*
+## Setup
 
-Image classification by **tensorflow** and **opencv**.<br>
-Only four python scripts can complete the training and deployment of custom model.<br>
-preprocess.py: Rename & Resize pictures<br>
-train.py: Generate dataset and Train<br>
-test_model.py: Check the Performance of the new model<br>
-deploy.py: Use camera to run the new model
+TensorFlow is installed with pip inside Conda because the official TensorFlow wheels are the supported distribution on Windows. The default workflow is CPU-friendly.
 
-# *2. Preparation*
-## 2.1. Install Visual Studio Community 2022
-Install the item named "C++ for Desktop Development".
-
-## 2.2. Install Anaconda
-```python
-// Run Anaconda Prompt, coding...
-conda create -n tensorflow python>3.8
-activate tensorflow
-pip install tensorflow>2.8
-pip install labelImg
-pip install opencv-python
-pip install pillow
+```powershell
+conda env create -f environment.yml
+conda activate tf-image-classification
 ```
 
+## Dataset layout
 
-# *3. Usage*
+Put images into one directory per class. Annotations are not required for classification.
 
-1.Put images in folder named **"voc_dataset"**, subfolders named **"classes_index"**.
+```text
+voc_dataset/
+  black/
+    image_001.jpg
+  white/
+    image_001.jpg
+```
 
-2.Run **"preprocess.py"** to rename and resize the images.
+Create a clean 224 x 224 copy without overwriting your originals:
 
-3.Run **labelImg** to annotate all the images.
+```powershell
+python preprocess.py --source voc_dataset --output pic_source --image-size 224
+```
 
-4.Run **"train.py"** to generate a new model.
+## Train, test, and run
 
-5.Run **"test_model.py"** to test the accuracy of model.
+```powershell
+python train.py --data pic_source --output artifacts --epochs 20
+python test_model.py --model artifacts/classifier.keras --labels artifacts/class_names.json test.jpg
+python deploy.py --model artifacts/classifier.keras --labels artifacts/class_names.json --source 0
+```
 
-6.Run **"deploy.py"** on computer or embedded device to classify object real-time.
-
- # *4. FlowChart*
- ![Alt](https://img-blog.csdnimg.cn/5ae5b372ccd9494d8de4028771da26ab.png#pic_center)
+Use `--weights none` when the machine cannot download ImageNet weights. All commands support `--help`.

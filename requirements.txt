@@ -1,0 +1,3 @@
+﻿tensorflow>=2.16,<2.20
+opencv-python>=4.9
+Pillow>=10.0

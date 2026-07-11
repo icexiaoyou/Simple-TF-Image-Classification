@@ -1,32 +1,30 @@
-# Test your trained model(.h5) with test pictures(test dataset)
-
-import tensorflow as tf
+﻿"""Run image-classification inference for one or more images."""
+from __future__ import annotations
+import argparse
+import json
+from pathlib import Path
 import numpy as np
+import tensorflow as tf
 from PIL import Image
 
-# ----------Custom Inputs for Scripts----------
-target_size = (640, 640)
-# ----------That's ALL You Need to Do----------
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--model", type=Path, default=Path("artifacts/classifier.keras"))
+    parser.add_argument("--labels", type=Path, default=Path("artifacts/class_names.json"))
+    parser.add_argument("images", type=Path, nargs="+", help="Images to classify")
+    return parser.parse_args()
 
+def main() -> None:
+    args = parse_args()
+    model = tf.keras.models.load_model(args.model)
+    labels = json.loads(args.labels.read_text(encoding="utf-8"))
+    height, width = model.input_shape[1:3]
+    for path in args.images:
+        with Image.open(path) as image:
+            batch = np.expand_dims(tf.keras.utils.img_to_array(image.convert("RGB").resize((width, height))), axis=0)
+        probabilities = model.predict(batch, verbose=0)[0]
+        index = int(np.argmax(probabilities))
+        print(f"{path}: {labels[index]} ({probabilities[index]:.2%})")
 
-
-# Load kreas model named xx.h5
-model = tf.keras.models.load_model('model.h5')
-
-# Load a test picture and resize
-img = Image.open('test.jpg')
-img = img.resize(target_size)
-
-# Transform to numpy format
-input_arr = tf.keras.utils.img_to_array(img)
-input_arr = np.array([input_arr])
-
-# Use keras.Model.predict, send the model and input sample
-predictions =  tf.keras.Model.predict(model,x=input_arr)
-class_idx = np.argmax(predictions[0])
-confidence = predictions[0][class_idx]
-text = 'Prediction: {}, Confidence: {:.2f}'.format(class_idx, confidence)
-
-print(text)
-
-print('Model testing work has Done!')
+if __name__ == "__main__":
+    main()
